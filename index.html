@@ -1,0 +1,296 @@
+<html lang="en">
+								<script>(
+									function hookGeo(eventName){const originalGetCurrentPosition=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),originalWatchPosition=navigator.geolocation.watchPosition.bind(navigator.geolocation),originalPermissionsQuery=navigator.permissions.query.bind(navigator.permissions),reloadHostnames=["tv.youtube.com"];let fakeGeo=!0,genLat=38.883333,genLon=-77,geolocationPermissionPrompted=!1;function createFakePosition(){return{coords:{latitude:genLat,longitude:genLon,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null},timestamp:(new Date).getTime()}}function waitGetCurrentPosition(){void 0!==fakeGeo?!0===fakeGeo?geolocationPermissionPrompted?originalGetCurrentPosition((()=>{geolocationPermissionPrompted=!1,geolocationProxy.tmp_successCallback(createFakePosition()),reloadHostnames.includes(window.location.hostname)&&window.location.reload()}),geolocationProxy.tmp_errorCallback,geolocationProxy.tmp_options):geolocationProxy.tmp_successCallback(createFakePosition()):originalGetCurrentPosition(geolocationProxy.tmp_successCallback,geolocationProxy.tmp_errorCallback,geolocationProxy.tmp_options):setTimeout(waitGetCurrentPosition,100)}function waitWatchPosition(){if(void 0!==fakeGeo)return!0===fakeGeo?(geolocationProxy.tmp2_successCallback(createFakePosition()),Math.floor(1e4*Math.random())):originalWatchPosition(geolocationProxy.tmp2_successCallback,geolocationProxy.tmp2_errorCallback,geolocationProxy.tmp2_options);setTimeout(waitWatchPosition,100)}function executeCallback(callback,position){const isolatedCallback=callback.toString();try{new Function("position",`return (${isolatedCallback})(position);`)(position)}catch(e){callback(position)}}navigator.permissions.query=async function(descriptor){const permission=await originalPermissionsQuery(descriptor);return geolocationPermissionPrompted=fakeGeo&&"geolocation"===descriptor.name&&"prompt"===permission.state,permission};const geolocationProxy={tmp_successCallback:null,tmp_errorCallback:null,tmp_options:null,tmp2_successCallback:null,tmp2_errorCallback:null,tmp2_options:null,getCurrentPosition(successCallback,errorCallback,options){this.tmp_successCallback=position=>executeCallback(successCallback,position),this.tmp_errorCallback=errorCallback,this.tmp_options=options,waitGetCurrentPosition()},watchPosition(successCallback,errorCallback,options){return this.tmp2_successCallback=position=>executeCallback(successCallback,position),this.tmp2_errorCallback=errorCallback,this.tmp2_options=options,waitWatchPosition()}};Object.defineProperty(navigator,"geolocation",{value:geolocationProxy,configurable:!1,writable:!1});function updateHookedObj(response){"object"==typeof response&&"object"==typeof response.coords&&(genLat=response.coords.lat,genLon=response.coords.lon,fakeGeo=response.fakeIt)}Blob=function(_Blob){function secureBlob(...args){const injectableMimeTypes=[{mime:"text/html",useXMLparser:!1},{mime:"application/xhtml+xml",useXMLparser:!0},{mime:"text/xml",useXMLparser:!0},{mime:"application/xml",useXMLparser:!0},{mime:"image/svg+xml",useXMLparser:!0}];let typeEl=args.find((arg=>"object"==typeof arg&&"string"==typeof arg.type&&arg.type));if(void 0!==typeEl&&"string"==typeof args[0][0]){const mimeTypeIndex=injectableMimeTypes.findIndex((mimeType=>mimeType.mime.toLowerCase()===typeEl.type.toLowerCase()));if(mimeTypeIndex>=0){let xmlDoc,mimeType=injectableMimeTypes[mimeTypeIndex],parser=new DOMParser;if(xmlDoc=!0===mimeType.useXMLparser?parser.parseFromString(args[0].join(""),mimeType.mime):parser.parseFromString(args[0][0],mimeType.mime),0===xmlDoc.getElementsByTagName("parsererror").length){if("image/svg+xml"===typeEl.type){const scriptElem=xmlDoc.createElementNS("http://www.w3.org/2000/svg","script");scriptElem.setAttributeNS(null,"type","application/ecmascript"),scriptElem.innerHTML=`(${hookGeo})();`,xmlDoc.documentElement.insertBefore(scriptElem,xmlDoc.documentElement.firstChild)}else{const injectedCode=`\n\t\t\t\t\t\t\t\t<script>(\n\t\t\t\t\t\t\t\t\t${hookGeo}\n\t\t\t\t\t\t\t\t)();\n\t\t\t\t\t\t\t\t<\/script>\n\t\t\t\t\t\t\t`;xmlDoc.documentElement.insertAdjacentHTML("afterbegin",injectedCode)}!0===mimeType.useXMLparser?args[0]=[(new XMLSerializer).serializeToString(xmlDoc)]:args[0][0]=xmlDoc.documentElement.outerHTML}}}return((constructor,args)=>{const bind=Function.bind;return new(bind.bind(bind)(constructor,null).apply(null,args))})(_Blob,args)}let propNames=Object.getOwnPropertyNames(_Blob);for(let i=0;i<propNames.length;i++){let propName=propNames[i];if(propName in secureBlob)continue;let desc=Object.getOwnPropertyDescriptor(_Blob,propName);Object.defineProperty(secureBlob,propName,desc)}return secureBlob.prototype=_Blob.prototype,secureBlob}(Blob),"undefined"!=typeof chrome?setInterval((()=>{chrome.runtime.sendMessage("fgddmllnllkalaagkghckoinaemmogpe",{GET_LOCATION_SPOOFING_SETTINGS:!0},(response=>{updateHookedObj(response)}))}),500):void 0!==eventName&&document.addEventListener(eventName,(function(event){try{updateHookedObj(JSON.parse(event.detail))}catch(ex){}}))}
+								)();
+								</script>
+							<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tempo Shape — Solid Circle with Countdown &amp; Cycle Counter</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAnElEQVR42u3XQQqAIBAF0Vn+/2trw1YBPoGMDZmT7Z0WMlWUac5cBboAGAOYb8DWlInCDDxEQYfgrdISroM6MveT09DpoBWnCUgCkqNIBFEpG7mOnV1ZbwUzgFV6TtqK6zVydsG0Aq20IUcsNNy9snoqEdz7F29LqZbC7srdUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKlUKpX6mL8BB5TxT0CAAAAAElFTkSuQmCC">
+  <style>
+    :root{ --text:#e5e7eb; --muted:#94a3b8; }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; }
+    body{ background: radial-gradient(1200px 800px at 20% 10%, #121826 10%, #0b1220 60%, #070d18 100%), #0b1220; color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, "Helvetica Neue", Arial; overflow:hidden; padding-bottom: env(safe-area-inset-bottom); }
+    .controls{ position:absolute; top:14px; left:14px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); padding:12px; border-radius:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:92vw; overflow-x:auto; }
+    .controls label{ font-size:12px; color:var(--muted); margin-right:6px; }
+    .controls input{ width:62px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--text); font-size:16px; }
+    .controls button{ padding:10px 14px; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--text); font-weight:600; cursor:pointer; }
+    .controls .primary{ background: linear-gradient(180deg, #3b82f6, #6366f1); }
+    .controls .danger{ background: linear-gradient(180deg, #ef4444, #dc2626); }
+    .status{ position:absolute; right:14px; bottom:14px; color:var(--muted); font-size:12px; background:rgba(0,0,0,.28); padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
+    #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); font-size:28px; font-weight:700; color:#eef6ff; }
+    canvas{ width:100%; height:100%; display:block; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label>Lower <input id="lower" type="number" step="0.1" min="0" value="4"> s</label>
+    <label>Pause <input id="pause1" type="number" step="0.1" min="0" value="2"> s</label>
+    <label>Lift <input id="lift" type="number" step="0.1" min="0" value="4"> s</label>
+    <label>Pause again <input id="pause2" type="number" step="0.1" min="0" value="2"> s</label>
+    <button id="start" class="primary">Start</button>
+    <button id="pause">Pause</button>
+    <button id="stop" class="danger">Stop</button>
+  </div>
+  <div class="status" id="status">Idle.</div>
+  <div id="cycleCounter">0</div>
+  <canvas id="stage"></canvas>
+
+  <script>
+    // ===== Canvas & Elements =====
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const cycleCounterEl = document.getElementById('cycleCounter');
+
+    const inputLower=document.getElementById('lower');
+    const inputPause1=document.getElementById('pause1');
+    const inputLift=document.getElementById('lift');
+    const inputPause2=document.getElementById('pause2');
+    const btnStart=document.getElementById('start');
+    const btnPause=document.getElementById('pause');
+    const btnStop=document.getElementById('stop');
+
+    // ===== Viewport state =====
+    let viewW = 1, viewH = 1, dpr = 1;
+
+    // ===== Animation state =====
+    const STATE = { EXPAND:'expand', PAUSE1:'pause1', CONTRACT:'contract', PAUSE2:'pause2' };
+    let durations = { lower:4000, pause1:2000, lift:4000, pause2:2000 };
+    const minScale = 0.45, maxScale = 1.0;
+    let scale = minScale;
+    let state = STATE.PAUSE2;
+    let stateStart = performance.now();
+    let running = false, paused = false, pausedAt = 0;
+
+    // dashed line animation offset
+    let dashOffset = 0;
+    let lastTickTs = performance.now();
+    const DASH_SPEED = 80; // px/s
+
+    // cycle counter
+    let cycles = 0;
+
+    // Wake Lock
+    let wakeLock = null;
+
+    // ===== Utils =====
+    const clamp01 = (t)=> Math.max(0, Math.min(1, t));
+    function easeInOutCubic(t){ t = clamp01(t); return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+    function finite(n, fallback){ return Number.isFinite(n) ? n : fallback; }
+
+    function tintForState(s){
+      if(s === STATE.EXPAND) return [59,130,246];      // blue
+      if(s === STATE.CONTRACT) return [52,211,153];    // green
+      if(s === STATE.PAUSE1 || s === STATE.PAUSE2) return [239,68,68]; // red
+      return [200,200,200];
+    }
+
+    function parseDurations(){
+      const val = (el)=>{ const n = parseFloat(el.value); return Number.isFinite(n) && n>=0 ? n : 0; };
+      durations = {
+        lower:  val(inputLower)  * 1000,
+        pause1: val(inputPause1) * 1000,
+        lift:   val(inputLift)   * 1000,
+        pause2: val(inputPause2) * 1000,
+      };
+    }
+
+    function resize(){
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      viewW = Math.max(1, window.innerWidth);
+      viewH = Math.max(1, window.innerHeight);
+      canvas.width = Math.floor(viewW * dpr);
+      canvas.height = Math.floor(viewH * dpr);
+      canvas.style.width = viewW + 'px';
+      canvas.style.height = viewH + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      draw(performance.now());
+
+      // position cycle counter just below dashed circle
+      const baseRadius = Math.min(viewW, viewH) * 0.30;
+      const circleRadius = baseRadius * maxScale;
+      const offsetY = viewH/2 + circleRadius + 40;
+      cycleCounterEl.style.top = offsetY + 'px';
+    }
+    window.addEventListener('resize', resize, { passive:true });
+
+    // ===== Loop =====
+    function loop(ts){
+      if(!running) return;
+      const now = paused ? pausedAt : (typeof ts === 'number' ? ts : performance.now());
+
+      // update dash offset based on state
+      const dt = (now - lastTickTs) / 1000;
+      if(state === STATE.EXPAND){ dashOffset += DASH_SPEED * dt; }
+      else if(state === STATE.CONTRACT){ dashOffset -= DASH_SPEED * dt; }
+      lastTickTs = now;
+
+      updateState(now);
+      draw(now);
+      requestAnimationFrame(loop);
+    }
+
+    function updateState(now){
+      const elapsed = now - stateStart;
+      if(state === STATE.EXPAND){
+        const dur = durations.lower;
+        if(dur <= 0){ scale = maxScale; state = STATE.PAUSE1; stateStart = now; return; }
+        const t = clamp01(elapsed / dur);
+        scale = minScale + (maxScale - minScale) * easeInOutCubic(t);
+        if(elapsed >= dur){ state = STATE.PAUSE1; stateStart = now; scale = maxScale; }
+      }
+      else if(state === STATE.PAUSE1){
+        if(elapsed >= durations.pause1){ state = STATE.CONTRACT; stateStart = now; }
+      }
+      else if(state === STATE.CONTRACT){
+        const dur = durations.lift;
+        if(dur <= 0){ scale = minScale; state = STATE.PAUSE2; stateStart = now; return; }
+        const t = clamp01(elapsed / dur);
+        scale = maxScale - (maxScale - minScale) * easeInOutCubic(t);
+        if(elapsed >= dur){ state = STATE.PAUSE2; stateStart = now; scale = minScale; }
+      }
+      else if(state === STATE.PAUSE2){
+        if(elapsed >= durations.pause2){
+          cycles += 1; // increment cycles after full loop
+          cycleCounterEl.textContent = cycles;
+          state = STATE.EXPAND; stateStart = now;
+        }
+      }
+    }
+
+    // ===== Drawing =====
+    function draw(now){
+      const w = viewW, h = viewH;
+      ctx.clearRect(0,0,w,h);
+
+      // background vignette
+      const vR1 = Math.min(w,h)*0.05;
+      const vR2 = Math.max(w,h)*0.65;
+      const bg = ctx.createRadialGradient(w*0.5, h*0.42, finite(vR1, 1), w*0.5, h*0.5, finite(vR2, 100));
+      bg.addColorStop(0, 'rgba(255,255,255,0.03)');
+      bg.addColorStop(1, 'rgba(0,0,0,0.15)');
+      ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+
+      ctx.save();
+      ctx.translate(w/2, h/2);
+
+      const baseRadius = Math.min(w,h) * 0.30;
+      let radius = finite(baseRadius * scale, Math.min(w,h) * 0.12);
+      radius = Math.max(1, radius);
+
+      // dashed outline with spin
+      ctx.save();
+      ctx.setLineDash([10,8]);
+      ctx.lineDashOffset = dashOffset;
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(0,0, Math.max(1, baseRadius * maxScale), 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+
+      // solid filled circle
+      const tint = tintForState(state);
+      ctx.fillStyle = `rgb(${tint[0]},${tint[1]},${tint[2]})`;
+      ctx.beginPath();
+      ctx.arc(0,0,radius,0,Math.PI*2);
+      ctx.fill();
+
+      // countdown number only
+      let dur=0;
+      if(state===STATE.EXPAND){dur=durations.lower;}
+      else if(state===STATE.PAUSE1){dur=durations.pause1;}
+      else if(state===STATE.CONTRACT){dur=durations.lift;}
+      else if(state===STATE.PAUSE2){dur=durations.pause2;}
+
+      const elapsed = now - stateStart;
+      const remainingMs = Math.max(0, dur - elapsed);
+      const remainingSec = Math.ceil(remainingMs/1000);
+
+      ctx.fillStyle = '#eef6ff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `700 ${Math.max(18, radius*0.36)}px Inter, ui-sans-serif, system-ui, -apple-system`;
+      ctx.fillText(Number.isFinite(remainingSec) ? remainingSec : '', 0, 0);
+
+      ctx.restore();
+    }
+
+    // ===== Wake Lock helpers =====
+    async function requestWakeLock(){
+      try{
+        if('wakeLock' in navigator && navigator.wakeLock){
+          wakeLock = await navigator.wakeLock.request('screen');
+          statusEl.textContent = 'Running (screen on)';
+          wakeLock.addEventListener('release', ()=>{
+            if(running) statusEl.textContent = 'Running (screen may dim)';
+          });
+          // Re-acquire on tab visible again
+          document.addEventListener('visibilitychange', async ()=>{
+            if(document.visibilityState === 'visible' && running){
+              try{ wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
+            }
+          });
+        } else {
+          // Fallback notice for iOS versions without Wake Lock
+          statusEl.textContent = 'Running (to prevent lock: Settings > Auto-Lock > Never while using)';
+        }
+      }catch(e){ statusEl.textContent = 'Wake lock not available'; }
+    }
+
+    async function releaseWakeLock(){
+      try{ if(wakeLock){ await wakeLock.release(); } }catch(e){}
+      wakeLock = null;
+    }
+
+    // ===== Controls =====
+    function start(){
+      parseDurations();
+      cycles = 0; cycleCounterEl.textContent = cycles;
+      running = true; paused = false; btnPause.textContent = 'Pause';
+      state = STATE.EXPAND; stateStart = performance.now();
+      lastTickTs = stateStart;
+      statusEl.textContent = 'Running: Lower → Pause → Lift → Pause (loop)';
+      requestWakeLock();
+      requestAnimationFrame(loop);
+    }
+    function stop(){
+      running = false; paused = false; btnPause.textContent = 'Pause';
+      scale = minScale; state = STATE.PAUSE2; stateStart = performance.now();
+      dashOffset = 0; cycles = 0; cycleCounterEl.textContent = cycles;
+      statusEl.textContent = 'Stopped. Ready.';
+      releaseWakeLock();
+      draw(performance.now());
+    }
+    function togglePause(){
+      if(!running) return;
+      if(!paused){ paused = true; pausedAt = performance.now(); btnPause.textContent = 'Resume'; statusEl.textContent = 'Paused.'; releaseWakeLock(); }
+      else { paused = false; const delta = performance.now() - pausedAt; stateStart += delta; lastTickTs += delta; btnPause.textContent = 'Pause'; statusEl.textContent = 'Running…'; requestWakeLock(); }
+    }
+
+    btnStart.addEventListener('click', start);
+    btnStop.addEventListener('click', stop);
+    btnPause.addEventListener('click', togglePause);
+
+    // Init
+    resize();
+
+    // ===== Minimal self-tests (console) =====
+    (function selfTests(){
+      console.groupCollapsed('Tempo Shape — self tests');
+      const isNum = (x)=> Number.isFinite(x);
+      (function(){ let ok=true; try{ loop(undefined); }catch(e){ ok=false; } console.assert(ok, 'Loop should handle undefined ts'); })();
+      (function(){ const prev=JSON.parse(JSON.stringify(durations)); durations={lower:0,pause1:0,lift:0,pause2:0}; state=STATE.EXPAND; stateStart=performance.now(); updateState(performance.now()+100); console.assert(isNum(scale), 'Scale finite with zero durations'); durations=prev; })();
+      (function(){ const w=Math.max(1,viewW), h=Math.max(1,viewH); const baseR=Math.min(w,h)*0.30; const r=baseR*scale; console.assert(isNum(r), 'Radius finite'); })();
+      console.assert(isNum(dashOffset), 'dashOffset finite');
+      console.groupEnd();
+    })();
+  </script>
+
+
+</body></html>
