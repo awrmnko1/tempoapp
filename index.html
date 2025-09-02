@@ -30,16 +30,7 @@
     /* Center stage */
     .stage-wrap{ position:relative; flex:1 1 auto; min-height:320px; }
     #stage{ width:100%; height:100%; display:block; }
-   #cycleCounter{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:10px;         /* sit inside the canvas area */
-  font-size:28px;
-  font-weight:700;
-  color:#eef6ff;
-  pointer-events:none;
-}
+   #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); /* top set dynamically in draw() */ font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
 
     /* Bottom buttons */
     .buttons{ position:fixed; left:0; right:0; bottom:0; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
@@ -221,6 +212,11 @@ const maxRByH = Math.max(40, (viewH - counterH - margin*2)/2);
 const maxRByW = Math.max(40, (viewW - margin*2)/2);
 const outlineR = Math.min(maxRByH, maxRByW);
 
+      // Position the cycle counter just below the circle, but keep it inside the stage
+      const counterGap = 12; // gap between circle edge and counter text
+      const counterY = Math.min(viewH - 10, viewH/2 + outlineR + counterGap);
+      cycleCounterEl.style.top = counterY + 'px';
+
       const radius=outlineR*scale;
       ctx.save(); ctx.setLineDash([12,10]); ctx.lineDashOffset=dashOffset; ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.55)';
       ctx.beginPath(); ctx.arc(0,0,outlineR,0,Math.PI*2); ctx.stroke(); ctx.restore();
@@ -296,5 +292,4 @@ const outlineR = Math.min(maxRByH, maxRByW);
     updatePlayPauseIcon();
   </script>
 </body>
-</html
-
+</html>
