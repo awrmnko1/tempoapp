@@ -135,12 +135,30 @@
     }
 
     function resize(){
-      dpr=Math.min(window.devicePixelRatio||1,2);
-      viewW=canvas.clientWidth; viewH=canvas.clientHeight;
-      canvas.width=Math.floor(viewW*dpr); canvas.height=Math.floor(viewH*dpr);
+      // Use visual viewport height on mobile for true on-screen space
+      const vh = (window.visualViewport && window.visualViewport.height)
+        ? Math.round(window.visualViewport.height)
+        : window.innerHeight;
+
+      const controlsEl = document.querySelector('.controls');
+      const buttonsEl = document.querySelector('.buttons');
+      const topH = controlsEl ? controlsEl.clientHeight : 0;
+      const bottomH = buttonsEl ? buttonsEl.clientHeight : 0;
+
+      // Height available between top and bottom bars so the circle is equidistant
+      const availableH = Math.max(200, vh - topH - bottomH);
+      stageWrap.style.height = availableH + 'px';
+
+      dpr = Math.min(window.devicePixelRatio||1, 2);
+      const rect = stageWrap.getBoundingClientRect();
+      viewW = Math.floor(rect.width);
+      viewH = Math.floor(rect.height);
+      canvas.width = Math.floor(viewW*dpr);
+      canvas.height = Math.floor(viewH*dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      const baseRadius=Math.min(viewW,viewH)*0.42;
-      cycleCounterEl.style.top=(viewH/2+baseRadius+20)+'px';
+
+      const baseRadius = Math.min(viewW,viewH)*0.42;
+      cycleCounterEl.style.top = (viewH/2 + baseRadius + 20) + 'px';
     }
     window.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
 
