@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Tempo Shape — Pill Dropdown + iPhone Safe</title>
+  <title>Tempo Shape — Block Layout (Top/Middle/Bottom)</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
@@ -12,28 +12,27 @@
 
     html,body{ height:100%; margin:0; }
     body{
+      min-height:100svh; /* stable viewport on mobile */
       display:flex; flex-direction:column;
-      background:#000;
-      color:var(--text);
-      overflow:hidden;
+      background:#000; color:var(--text);
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
-      min-height: 100svh;
+      overflow:hidden; /* prevent accidental scroll */
     }
 
-    /* Top controls */
-    .controls{ display:flex; gap:16px; justify-content:center; align-items:flex-start; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); overflow-x:auto; }
+    /* Top controls (fixed height, sits at top) */
+    .controls{ flex:0 0 auto; display:flex; gap:16px; justify-content:center; align-items:flex-start; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); overflow-x:auto; }
     .input-group{ display:flex; flex-direction:column; align-items:center; }
     .input-group input{ width:44px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--text); font-size:16px; text-align:center; }
     .input-group span{ font-size:12px; color:var(--muted); margin-top:4px; text-align:center; }
 
-    /* Center stage */
-    .stage-wrap{ position:relative; flex:1 1 auto; min-height:320px; }
+    /* Middle stage (always between top & bottom bars) */
+    .stage-wrap{ position:relative; flex:1 1 auto; min-height:220px; }
     #stage{ width:100%; height:100%; display:block; }
-   #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); /* top set dynamically in draw() */ font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
+    #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
 
-    /* Bottom buttons */
-    .buttons{ position:fixed; left:0; right:0; bottom:0; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
+    /* Bottom buttons (fixed height, sits at bottom, not overlay) */
+    .buttons{ flex:0 0 auto; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
     .round{ width:64px; height:64px; border-radius:50%; border:1px solid rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; }
     .round.primary{ background:#1e3a8a; } /* dark blue */
     .round.danger{ background:#7f1d1d; } /* dark red */
@@ -45,11 +44,8 @@
     .pill-select{ position:relative; }
     .pill-select select{
       -webkit-appearance:none; appearance:none; outline:none;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 36px 10px 14px;
-      border-radius:9999px; font-size:16px; text-align-last:center; cursor:pointer;
+      border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06);
+      color:var(--text); padding:10px 36px 10px 14px; border-radius:9999px; font-size:16px; text-align-last:center; cursor:pointer;
     }
     .pill-select svg{ position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; width:16px; height:16px; opacity:.9; }
 
@@ -96,8 +92,9 @@
   <div class="status" id="status">Idle.</div>
 
   <script>
-    // JS unchanged from previous version
+    // Elements
     const canvas = document.getElementById('stage');
+    const stageWrap = document.getElementById('stageWrap');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
     const cycleCounterEl = document.getElementById('cycleCounter');
@@ -111,7 +108,10 @@
     const btnPlayPause=document.getElementById('playPause');
     const btnStop=document.getElementById('stop');
 
+    // Viewport
     let viewW=1, viewH=1, dpr=1;
+
+    // State
     const STATE = { PRECOUNT:'precount', EXPAND:'expand', PAUSE1:'pause1', CONTRACT:'contract', PAUSE2:'pause2' };
     let durations = { lower:4000, pause1:2000, lift:4000, pause2:2000 };
     let minScale=0.45, maxScale=1.0, scale=minScale;
@@ -121,6 +121,7 @@
     let dashOffset=0, lastTickTs=performance.now();
     let cycles=0;
 
+    // Utils
     function clamp01(t){ return Math.max(0,Math.min(1,t)); }
     function easeInOutCubic(t){ t=clamp01(t); return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
     function tintForState(s){
@@ -134,35 +135,22 @@
       durations={lower:val(inputLower)*1000,pause1:val(inputPause1)*1000,lift:val(inputLift)*1000,pause2:val(inputPause2)*1000};
     }
 
-function resize(){
-  // Use visual viewport on mobile to avoid Safari UI chrome jumps
-  const vv = window.visualViewport;
-  const vh = vv && vv.height ? Math.round(vv.height) : window.innerHeight;
-
-  const controlsEl = document.querySelector('.controls');
-  const buttonsEl = document.querySelector('.buttons');
-  const topH = controlsEl ? Math.ceil(controlsEl.getBoundingClientRect().height) : 0;
-  const bottomH = buttonsEl ? Math.ceil(buttonsEl.getBoundingClientRect().height) : 0;
-
-  // Height strictly between the bars; guard for tiny screens
-  const availableH = Math.max(240, vh - topH - bottomH);
-  stageWrap.style.height = availableH + 'px';
-
-  dpr = Math.min(window.devicePixelRatio||1, 2);
-  const rect = stageWrap.getBoundingClientRect();
-  viewW = Math.floor(rect.width);
-  viewH = Math.floor(rect.height);
-  canvas.width = Math.floor(viewW*dpr);
-  canvas.height = Math.floor(viewH*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-
+    // Pure measure-based resize (middle never overlaps bars)
+    function resize(){
+      dpr=Math.min(window.devicePixelRatio||1,2);
+      const rect = stageWrap.getBoundingClientRect();
+      viewW = Math.floor(rect.width);
+      viewH = Math.floor(rect.height);
+      canvas.width=Math.floor(viewW*dpr); canvas.height=Math.floor(viewH*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
     window.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
-  window.visualViewport.addEventListener('scroll',  ()=>{ resize(); draw(performance.now()); }, {passive:true});
-}
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
+      window.visualViewport.addEventListener('scroll', ()=>{ resize(); draw(performance.now()); }, {passive:true});
+    }
 
+    // Loop
     function loop(ts){
       if(!running) return;
       const now=paused?pausedAt:(typeof ts==='number'?ts:performance.now());
@@ -199,21 +187,21 @@ if (window.visualViewport) {
         const remainingMs = Math.max(0, preCountEnd - now);
         const remainingSec = Math.ceil(remainingMs/1000);
         ctx.fillStyle = '#eef6ff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        const fontSize = Math.max(32, Math.min(viewW,viewH)*0.25);
+        const fontSize = Math.max(28, Math.min(viewW,viewH)*0.24);
         ctx.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`;
         ctx.fillText(Number.isFinite(remainingSec)?remainingSec:'', 0, 0);
         ctx.restore(); return;
       }
 
-      // Compute an outline radius that ALWAYS fits and leaves space for the counter
-const margin = 12;     // interior breathing room
-const counterH = 40;   // space so the counter is visible above the bottom
-const maxRByH = Math.max(40, (viewH - counterH - margin*2)/2);
-const maxRByW = Math.max(40, (viewW - margin*2)/2);
-const outlineR = Math.min(maxRByH, maxRByW);
+      // Compute radius that always fits middle zone and leaves room for counter label beneath
+      const margin = 12;      // interior breathing room
+      const counterH = 40;    // reserve space for counter inside middle zone
+      const maxRByH = Math.max(36, (viewH - counterH - margin*2)/2);
+      const maxRByW = Math.max(36, (viewW - margin*2)/2);
+      const outlineR = Math.min(maxRByH, maxRByW);
 
-      // Position the cycle counter just below the circle, but keep it inside the stage
-      const counterGap = 12; // gap between circle edge and counter text
+      // Position counter just under the circle but clamped inside the middle zone
+      const counterGap = 10;
       const counterY = Math.min(viewH - 10, viewH/2 + outlineR + counterGap);
       cycleCounterEl.style.top = counterY + 'px';
 
@@ -221,7 +209,7 @@ const outlineR = Math.min(maxRByH, maxRByW);
       ctx.save(); ctx.setLineDash([12,10]); ctx.lineDashOffset=dashOffset; ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.55)';
       ctx.beginPath(); ctx.arc(0,0,outlineR,0,Math.PI*2); ctx.stroke(); ctx.restore();
 
-      // Compute tint — during pauses, step darker each elapsed second
+      // Tint logic (pauses darken per second)
       let tint;
       if (state===STATE.PAUSE1 || state===STATE.PAUSE2) {
         const pauseDur = state===STATE.PAUSE1 ? durations.pause1 : durations.pause2;
@@ -236,8 +224,12 @@ const outlineR = Math.min(maxRByH, maxRByW);
           Math.round(bright[1] + (dark[1]-bright[1]) * t),
           Math.round(bright[2] + (dark[2]-bright[2]) * t)
         ];
+      } else if (state===STATE.EXPAND) {
+        tint = [59,130,246];
+      } else if (state===STATE.CONTRACT) {
+        tint = [52,211,153];
       } else {
-        tint = tintForState(state);
+        tint = [200,200,200];
       }
 
       ctx.fillStyle=`rgb(${tint[0]},${tint[1]},${tint[2]})`;
@@ -246,12 +238,13 @@ const outlineR = Math.min(maxRByH, maxRByW);
       let dur=0; if(state===STATE.EXPAND) dur=durations.lower; else if(state===STATE.PAUSE1) dur=durations.pause1; else if(state===STATE.CONTRACT) dur=durations.lift; else dur=durations.pause2;
       const remMs=Math.max(0, dur - (now - stateStart)); const remSec=Math.ceil(remMs/1000);
       ctx.fillStyle='#eef6ff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.font=`700 ${Math.max(18, radius*0.34)}px Helvetica, Arial, sans-serif`;
+      ctx.font=`700 ${Math.max(16, radius*0.32)}px Helvetica, Arial, sans-serif`;
       ctx.fillText(Number.isFinite(remSec)?remSec:'', 0, 0);
 
       ctx.restore();
     }
 
+    // Controls
     function start(){
       parseDurations(); cycles=0; cycleCounterEl.textContent='0';
       running=true; paused=false;
@@ -288,6 +281,7 @@ const outlineR = Math.min(maxRByH, maxRByW);
         : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     }
 
+    // Init
     resize(); draw(performance.now());
     updatePlayPauseIcon();
   </script>
