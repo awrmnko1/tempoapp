@@ -30,7 +30,16 @@
     /* Center stage */
     .stage-wrap{ position:relative; flex:1 1 auto; min-height:320px; }
     #stage{ width:100%; height:100%; display:block; }
-    #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
+   #cycleCounter{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:10px;         /* sit inside the canvas area */
+  font-size:28px;
+  font-weight:700;
+  color:#eef6ff;
+  pointer-events:none;
+}
 
     /* Bottom buttons */
     .buttons{ position:fixed; left:0; right:0; bottom:0; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
@@ -134,33 +143,34 @@
       durations={lower:val(inputLower)*1000,pause1:val(inputPause1)*1000,lift:val(inputLift)*1000,pause2:val(inputPause2)*1000};
     }
 
-    function resize(){
-      // Use visual viewport height on mobile for true on-screen space
-      const vh = (window.visualViewport && window.visualViewport.height)
-        ? Math.round(window.visualViewport.height)
-        : window.innerHeight;
+function resize(){
+  // Use visual viewport on mobile to avoid Safari UI chrome jumps
+  const vv = window.visualViewport;
+  const vh = vv && vv.height ? Math.round(vv.height) : window.innerHeight;
 
-      const controlsEl = document.querySelector('.controls');
-      const buttonsEl = document.querySelector('.buttons');
-      const topH = controlsEl ? controlsEl.clientHeight : 0;
-      const bottomH = buttonsEl ? buttonsEl.clientHeight : 0;
+  const controlsEl = document.querySelector('.controls');
+  const buttonsEl = document.querySelector('.buttons');
+  const topH = controlsEl ? Math.ceil(controlsEl.getBoundingClientRect().height) : 0;
+  const bottomH = buttonsEl ? Math.ceil(buttonsEl.getBoundingClientRect().height) : 0;
 
-      // Height available between top and bottom bars so the circle is equidistant
-      const availableH = Math.max(200, vh - topH - bottomH);
-      stageWrap.style.height = availableH + 'px';
+  // Height strictly between the bars; guard for tiny screens
+  const availableH = Math.max(240, vh - topH - bottomH);
+  stageWrap.style.height = availableH + 'px';
 
-      dpr = Math.min(window.devicePixelRatio||1, 2);
-      const rect = stageWrap.getBoundingClientRect();
-      viewW = Math.floor(rect.width);
-      viewH = Math.floor(rect.height);
-      canvas.width = Math.floor(viewW*dpr);
-      canvas.height = Math.floor(viewH*dpr);
-      ctx.setTransform(dpr,0,0,dpr,0,0);
+  dpr = Math.min(window.devicePixelRatio||1, 2);
+  const rect = stageWrap.getBoundingClientRect();
+  viewW = Math.floor(rect.width);
+  viewH = Math.floor(rect.height);
+  canvas.width = Math.floor(viewW*dpr);
+  canvas.height = Math.floor(viewH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
 
-      const baseRadius = Math.min(viewW,viewH)*0.42;
-      cycleCounterEl.style.top = (viewH/2 + baseRadius + 20) + 'px';
-    }
     window.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
+  window.visualViewport.addEventListener('scroll',  ()=>{ resize(); draw(performance.now()); }, {passive:true});
+}
 
     function loop(ts){
       if(!running) return;
@@ -204,7 +214,13 @@
         ctx.restore(); return;
       }
 
-      const outlineR=Math.min(viewW,viewH)*0.42;
+      // Compute an outline radius that ALWAYS fits and leaves space for the counter
+const margin = 12;     // interior breathing room
+const counterH = 40;   // space so the counter is visible above the bottom
+const maxRByH = Math.max(40, (viewH - counterH - margin*2)/2);
+const maxRByW = Math.max(40, (viewW - margin*2)/2);
+const outlineR = Math.min(maxRByH, maxRByW);
+
       const radius=outlineR*scale;
       ctx.save(); ctx.setLineDash([12,10]); ctx.lineDashOffset=dashOffset; ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.55)';
       ctx.beginPath(); ctx.arc(0,0,outlineR,0,Math.PI*2); ctx.stroke(); ctx.restore();
@@ -281,3 +297,4 @@
   </script>
 </body>
 </html
+
