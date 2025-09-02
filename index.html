@@ -29,7 +29,7 @@
     /* Middle stage (always between top & bottom bars) */
     .stage-wrap{ position:relative; flex:1 1 auto; min-height:220px; }
     #stage{ width:100%; height:100%; display:block; }
-    #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
+    #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); bottom:10px; font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
 
     /* Bottom buttons (fixed height, sits at bottom, not overlay) */
     .buttons{ flex:0 0 auto; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
@@ -200,10 +200,7 @@
       const maxRByW = Math.max(36, (viewW - margin*2)/2);
       const outlineR = Math.min(maxRByH, maxRByW);
 
-      // Position counter just under the circle but clamped inside the middle zone
-      const counterGap = 10;
-      const counterY = Math.min(viewH - 10, viewH/2 + outlineR + counterGap);
-      cycleCounterEl.style.top = counterY + 'px';
+      // Counter is anchored via CSS (bottom:10px) inside the middle zone; no JS positioning needed.
 
       const radius=outlineR*scale;
       ctx.save(); ctx.setLineDash([12,10]); ctx.lineDashOffset=dashOffset; ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.55)';
@@ -287,3 +284,4 @@
   </script>
 </body>
 </html>
+
