@@ -3,35 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Tempo Shape — Final Version</title>
+  <title>Tempo Shape — Pill Dropdown + iPhone Safe</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
-    :root{ --text:#e5e7eb; --muted:#94a3b8; }
+    :root{ --text:#e5e7eb; --muted:#94a3b8; --bg:#000; }
     *{ box-sizing:border-box; font-family: Helvetica, Arial, sans-serif; }
-    html,body{ height:100%; margin:0; display:flex; flex-direction:column; }
-    body{ background: radial-gradient(1200px 800px at 20% 10%, #121826 10%, #0b1220 60%, #070d18 100%), #0b1220; color:var(--text); overflow:hidden; padding-bottom: env(safe-area-inset-bottom); }
+
+    html,body{ height:100%; margin:0; }
+    body{
+      display:flex; flex-direction:column;
+      background:#000;
+      color:var(--text);
+      overflow:hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      min-height: 100svh;
+    }
 
     /* Top controls */
-    .controls{ display:flex; gap:20px; justify-content:center; align-items:flex-start; padding:12px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
+    .controls{ display:flex; gap:16px; justify-content:center; align-items:flex-start; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); overflow-x:auto; }
     .input-group{ display:flex; flex-direction:column; align-items:center; }
-    .input-group input,.input-group select{ width:72px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--text); font-size:16px; text-align:center; }
-    .input-group select{ width:90px; }
+    .input-group input{ width:44px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--text); font-size:16px; text-align:center; }
     .input-group span{ font-size:12px; color:var(--muted); margin-top:4px; text-align:center; }
 
     /* Center stage */
-    .stage-wrap{ position:relative; flex:1; }
+    .stage-wrap{ position:relative; flex:1 1 auto; min-height:320px; }
     #stage{ width:100%; height:100%; display:block; }
     #cycleCounter{ position:absolute; left:50%; transform:translateX(-50%); font-size:28px; font-weight:700; color:#eef6ff; pointer-events:none; }
 
     /* Bottom buttons */
-    .buttons{ position:fixed; left:0; right:0; bottom:0; display:flex; gap:30px; justify-content:center; padding:16px calc(16px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
+    .buttons{ position:fixed; left:0; right:0; bottom:0; display:flex; gap:16px; justify-content:center; align-items:flex-end; padding:14px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); }
     .round{ width:64px; height:64px; border-radius:50%; border:1px solid rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; }
-    .round.primary{ background: linear-gradient(180deg, #3b82f6, #6366f1); }
-    .round.danger{ background: linear-gradient(180deg, #ef4444, #dc2626); }
+    .round.primary{ background:#1e3a8a; } /* dark blue */
+    .round.danger{ background:#7f1d1d; } /* dark red */
     .round svg{ width:28px; height:28px; fill:currentColor; }
 
-    .status{ position:fixed; right:14px; bottom:calc(80px + env(safe-area-inset-bottom)); color:var(--muted); font-size:12px; background:rgba(0,0,0,.28); padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
+    /* Pill dropdown (Countdown) */
+    .bottom-group{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .bottom-label{ font-size:12px; color:var(--muted); }
+    .pill-select{ position:relative; }
+    .pill-select select{
+      -webkit-appearance:none; appearance:none; outline:none;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 36px 10px 14px;
+      border-radius:9999px; font-size:16px; text-align-last:center; cursor:pointer;
+    }
+    .pill-select svg{ position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; width:16px; height:16px; opacity:.9; }
+
+    .status{ position:fixed; right:12px; bottom:calc(88px + env(safe-area-inset-bottom)); color:var(--muted); font-size:12px; background:rgba(0,0,0,.28); padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
   </style>
 </head>
 <body>
@@ -41,15 +63,6 @@
     <div class="input-group"><input id="pause1" type="number" step="0.1" min="0" value="2"><span>Pause</span></div>
     <div class="input-group"><input id="lift" type="number" step="0.1" min="0" value="4"><span>Lift</span></div>
     <div class="input-group"><input id="pause2" type="number" step="0.1" min="0" value="2"><span>Pause again</span></div>
-    <div class="input-group">
-      <select id="precount">
-        <option value="0">None</option>
-        <option value="3">3s</option>
-        <option value="5" selected>5s</option>
-        <option value="10">10s</option>
-      </select>
-      <span>Countdown</span>
-    </div>
   </div>
 
   <!-- Middle: Canvas -->
@@ -58,7 +71,7 @@
     <div id="cycleCounter">0</div>
   </div>
 
-  <!-- Bottom: Buttons -->
+  <!-- Bottom: Buttons + Countdown (pill) -->
   <div class="buttons">
     <button id="playPause" class="round primary" aria-label="Start">
       <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -66,12 +79,24 @@
     <button id="stop" class="round danger" aria-label="Stop">
       <svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
     </button>
+    <div class="bottom-group">
+      <span class="bottom-label">Countdown</span>
+      <div class="pill-select">
+        <select id="precount" aria-label="Countdown">
+          <option value="0">None</option>
+          <option value="3">3s</option>
+          <option value="5" selected>5s</option>
+          <option value="10">10s</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+      </div>
+    </div>
   </div>
 
   <div class="status" id="status">Idle.</div>
 
   <script>
-    // ===== Elements
+    // JS unchanged from previous version
     const canvas = document.getElementById('stage');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
@@ -86,10 +111,7 @@
     const btnPlayPause=document.getElementById('playPause');
     const btnStop=document.getElementById('stop');
 
-    // ===== Viewport
     let viewW=1, viewH=1, dpr=1;
-
-    // ===== State
     const STATE = { PRECOUNT:'precount', EXPAND:'expand', PAUSE1:'pause1', CONTRACT:'contract', PAUSE2:'pause2' };
     let durations = { lower:4000, pause1:2000, lift:4000, pause2:2000 };
     let minScale=0.45, maxScale=1.0, scale=minScale;
@@ -99,7 +121,6 @@
     let dashOffset=0, lastTickTs=performance.now();
     let cycles=0;
 
-    // ===== Utils
     function clamp01(t){ return Math.max(0,Math.min(1,t)); }
     function easeInOutCubic(t){ t=clamp01(t); return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
     function tintForState(s){
@@ -113,18 +134,16 @@
       durations={lower:val(inputLower)*1000,pause1:val(inputPause1)*1000,lift:val(inputLift)*1000,pause2:val(inputPause2)*1000};
     }
 
-    // ===== Resize
     function resize(){
       dpr=Math.min(window.devicePixelRatio||1,2);
       viewW=canvas.clientWidth; viewH=canvas.clientHeight;
       canvas.width=Math.floor(viewW*dpr); canvas.height=Math.floor(viewH*dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      const baseRadius=Math.min(viewW,viewH)*0.48;
+      const baseRadius=Math.min(viewW,viewH)*0.42;
       cycleCounterEl.style.top=(viewH/2+baseRadius+20)+'px';
     }
     window.addEventListener('resize', ()=>{ resize(); draw(performance.now()); }, {passive:true});
 
-    // ===== Loop
     function loop(ts){
       if(!running) return;
       const now=paused?pausedAt:(typeof ts==='number'?ts:performance.now());
@@ -153,7 +172,6 @@
       }
     }
 
-    // ===== Draw
     function draw(now){
       ctx.clearRect(0,0,viewW,viewH);
       ctx.save(); ctx.translate(viewW/2,viewH/2);
@@ -168,11 +186,30 @@
         ctx.restore(); return;
       }
 
-      const outlineR=Math.min(viewW,viewH)*0.48; const radius=outlineR*scale;
+      const outlineR=Math.min(viewW,viewH)*0.42;
+      const radius=outlineR*scale;
       ctx.save(); ctx.setLineDash([12,10]); ctx.lineDashOffset=dashOffset; ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,255,255,0.55)';
       ctx.beginPath(); ctx.arc(0,0,outlineR,0,Math.PI*2); ctx.stroke(); ctx.restore();
 
-      const tint=tintForState(state);
+      // Compute tint — during pauses, step darker each elapsed second
+      let tint;
+      if (state===STATE.PAUSE1 || state===STATE.PAUSE2) {
+        const pauseDur = state===STATE.PAUSE1 ? durations.pause1 : durations.pause2;
+        const steps = Math.max(1, Math.floor(pauseDur/1000));
+        const elapsedPause = Math.max(0, now - stateStart);
+        const step = Math.min(steps, Math.floor(elapsedPause/1000));
+        const bright = [239, 68, 68];
+        const dark   = [160, 20, 20];
+        const t = steps > 0 ? step/steps : 1;
+        tint = [
+          Math.round(bright[0] + (dark[0]-bright[0]) * t),
+          Math.round(bright[1] + (dark[1]-bright[1]) * t),
+          Math.round(bright[2] + (dark[2]-bright[2]) * t)
+        ];
+      } else {
+        tint = tintForState(state);
+      }
+
       ctx.fillStyle=`rgb(${tint[0]},${tint[1]},${tint[2]})`;
       ctx.beginPath(); ctx.arc(0,0, radius, 0, Math.PI*2); ctx.fill();
 
@@ -185,7 +222,6 @@
       ctx.restore();
     }
 
-    // ===== Controls
     function start(){
       parseDurations(); cycles=0; cycleCounterEl.textContent='0';
       running=true; paused=false;
@@ -222,9 +258,8 @@
         : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     }
 
-    // Init
     resize(); draw(performance.now());
     updatePlayPauseIcon();
   </script>
 </body>
-</html>
+</html
